@@ -466,8 +466,10 @@ export class FirestoreRepository<T extends { id?: ID }> {
 
             await docRef.set(updated, { merge: true });
 
-            await this.runHooks('afterUpdate', updated);
-            return updated as T & {id: ID};
+            const updatedWithId = { ...updated, id };
+            await this.runHooks('afterUpdate', updatedWithId);
+
+            return updatedWithId as T & { id: ID };
         }catch(error: any){
             if(error instanceof z.ZodError){
                 throw new ValidationError(error.issues);
